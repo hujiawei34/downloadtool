@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title id="page-title">文件浏览器</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div id="server-select-container">
+        <h2>选择服务器</h2>
+        <select id="server-list"></select>
+        <input type="password" id="server-password" placeholder="请输入密码">
+        <button id="test-connect-btn">测试连通性</button>
+        <span id="connect-status"></span>
+    </div>
+    <div id="main-ui" style="display:none;">
+        <button id="disconnect-btn">断开连接/切换服务器</button>
+        <div id="current-path-container">
+            <span id="current-path"></span>
+        </div>
+        <div id="file-list"></div>
+        <div id="upload-area">
+            <div class="upload-row">
+                <input type="file" id="file-upload" multiple>
+                <button id="upload-files-btn">上传文件</button>
+            </div>
+            <div class="upload-row">
+                <input type="file" id="folder-upload" webkitdirectory directory multiple>
+                <button id="upload-folders-btn">上传文件夹</button>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="/static/main.js"></script>
+</body>
+</html> 
