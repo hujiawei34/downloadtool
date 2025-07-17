@@ -1,0 +1,16 @@
+{
+    "port": 18023,
+    "remote_server_list": [
+        {
+            "server_name": "",
+            "config": {
+                "host_ip": "192.168.0.188",
+                "user_name": "pc",
+                "user_pwd": "",
+                "ssh_port": 22,
+                "default_dir": "~"
+            }
+        }
+    ],
+    "local_default_dir": "~"
+}
