@@ -415,4 +415,4 @@ app.add_url_rule('/api/upload', view_func=upload_file, methods=['POST'])
 app.add_url_rule('/api/delete', view_func=delete_file, methods=['POST'])
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=18023, debug=True) 
+    app.run(host='0.0.0.0', port=18023, debug=True) 
