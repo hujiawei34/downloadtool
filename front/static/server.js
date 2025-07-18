@@ -33,15 +33,13 @@ export function loadServerList(autoConnect = false) {
                             body: JSON.stringify({server_name: selectedServer.server_name, user_pwd: pwd})
                         });
                         document.getElementById('connect-status').textContent = '连接成功！';
-                        document.getElementById('server-select-container').style.display = 'none';
-                        document.getElementById('main-ui').style.display = '';
-                        fetch('/api/default_dir?mode=remote')
-                            .then(res => res.json())
-                            .then(data => {
-                                import('./file.js').then(module => {
-                                    module.fetchFileList(null, true, true);
-                                });
-                            });
+                        
+                        // 保存模式和服务器信息到localStorage
+                        localStorage.setItem('fileMode', 'remote');
+                        localStorage.setItem('selectedServer', JSON.stringify(selectedServer));
+                        
+                        // 跳转到文件管理页面
+                        window.location.href = '/files';
                     } else {
                         document.getElementById('connect-status').textContent = '自动连接失败: ' + (data.error || '未知错误');
                     }
@@ -55,9 +53,17 @@ export function loadServerList(autoConnect = false) {
 
 document.addEventListener('DOMContentLoaded', function() {
     localStorage.removeItem('lastPath');
-    loadServerList(true);
+    // 移除自动加载远程服务器列表
+    // loadServerList(true);
     document.getElementById('server-list').addEventListener('change', function() {
         selectedServer = serverList[this.value];
+    });
+    document.getElementById('use-local-btn').addEventListener('click', function() {
+        // 保存模式到localStorage
+        localStorage.setItem('fileMode', 'local');
+        
+        // 跳转到文件管理页面
+        window.location.href = '/files';
     });
     document.getElementById('test-connect-btn').addEventListener('click', function() {
         const pwd = document.getElementById('server-password').value;
@@ -76,33 +82,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     body: JSON.stringify({server_name: selectedServer.server_name, user_pwd: pwd})
                 });
                 document.getElementById('connect-status').textContent = '连接成功！';
-                document.getElementById('server-select-container').style.display = 'none';
-                document.getElementById('main-ui').style.display = '';
-                fetch('/api/default_dir?mode=remote')
-                    .then(res => {
-                        if (!res.ok) {
-                            throw new Error('获取默认目录失败');
-                        }
-                        return res.json();
-                    })
-                    .then(data => {
-                        if (data.error) {
-                            console.warn('默认目录警告:', data.error);
-                        }
-                        import('./file.js').then(module => {
-                            module.fetchFileList(null, true, true);
-                        }).catch(err => {
-                            console.error('加载file.js失败:', err);
-                        });
-                    })
-                    .catch(err => {
-                        console.error('获取默认目录失败:', err);
-                        import('./file.js').then(module => {
-                            module.fetchFileList('~', false, true);
-                        }).catch(err => {
-                            console.error('加载file.js失败:', err);
-                        });
-                    });
+                
+                // 保存模式和服务器信息到localStorage
+                localStorage.setItem('fileMode', 'remote');
+                localStorage.setItem('selectedServer', JSON.stringify(selectedServer));
+                
+                // 跳转到文件管理页面
+                window.location.href = '/files';
             } else {
                 document.getElementById('connect-status').textContent = '连接失败: ' + (data.error || '未知错误');
             }
@@ -110,12 +96,16 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('connect-status').textContent = '连接失败: ' + err.message;
         });
     });
-    document.getElementById('disconnect-btn').addEventListener('click', function() {
-        document.getElementById('main-ui').style.display = 'none';
-        document.getElementById('server-select-container').style.display = '';
-        document.getElementById('server-password').value = '';
-        document.getElementById('connect-status').textContent = '';
-        selectedServer = null;
-        localStorage.removeItem('lastPath');
-    });
-}); 
+    // 在files.html页面中使用的返回按钮处理
+    if (document.getElementById('back-to-server-btn')) {
+        document.getElementById('back-to-server-btn').addEventListener('click', function() {
+            // 清除保存的模式和路径
+            localStorage.removeItem('fileMode');
+            localStorage.removeItem('selectedServer');
+            localStorage.removeItem('lastPath');
+            
+            // 跳转回服务器选择页面
+            window.location.href = '/';
+        });
+    }
+});

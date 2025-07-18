@@ -2,6 +2,10 @@ import os
 from typing import List, Dict, Any, Optional
 from utils.log_util import default_logger as logger
 from ..file_service import FileService
+import json
+import os
+from pathlib import Path
+from utils.constants import PROJECT_ROOT
 
 class LocalFileService(FileService):
     def list_dir(self, mode: str, rel_path: str = "") -> Dict[str, Any]:
@@ -50,12 +54,24 @@ class LocalFileService(FileService):
 
     def upload_file(self, mode: str, rel_path: str, file_obj) -> Dict[str, Any]:
         logger.info(f"[LocalFileService] upload_file: mode={mode}, rel_path={rel_path}")
-        abs_path = (
+        # rel_path is the directory path, we need to combine it with the filename
+        directory_path = (
             os.path.abspath(rel_path)
             if os.path.isabs(rel_path)
             else os.path.abspath(os.path.join("/", rel_path))
         )
+        
+        # Get the filename from the file object
+        filename = file_obj.filename
+        if not filename:
+            return {"success": False, "error": "文件名为空"}
+        
+        # Combine directory path with filename
+        abs_path = os.path.join(directory_path, filename)
+        
         try:
+            # Create directory structure if it doesn't exist
+            os.makedirs(os.path.dirname(abs_path), exist_ok=True)
             file_obj.save(abs_path)
             return {"success": True, "path": abs_path}
         except Exception as e:
@@ -79,7 +95,18 @@ class LocalFileService(FileService):
 
     def get_default_dir(self, mode: str) -> Dict[str, Any]:
         logger.info(f"[LocalFileService] get_default_dir: mode={mode}")
-        return {"default_dir": "/"}
+        # 读取配置文件中的默认目录
+        config_path = PROJECT_ROOT / "config.json"
+        with open(config_path, 'r') as f:
+            config = json.load(f)
+        
+        # 获取配置值，默认为"~"
+        default_dir = config.get("local_default_dir", "~")
+        
+        # 解析家目录符号
+        resolved_dir = os.path.expanduser(default_dir)
+        
+        return {"default_dir": resolved_dir}
 
     def get_remote_servers(self) -> List[Dict[str, Any]]:
         logger.info("[LocalFileService] get_remote_servers called")

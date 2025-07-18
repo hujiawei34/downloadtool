@@ -1,3 +1,9 @@
 Flask
 Flask-Cors 
 paramiko
+
+# Testing dependencies
+pytest
+pytest-flask
+pytest-mock
+requests

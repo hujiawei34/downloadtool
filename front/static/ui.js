@@ -22,7 +22,7 @@ export function setupFileListClick() {
         if (e.target.tagName === 'A' && e.target.dataset.dirpath) {
             e.preventDefault();
             import('./file.js').then(module => {
-                module.fetchFileList(e.target.dataset.dirpath, true, true);
+                module.fetchFileList(e.target.dataset.dirpath, true);
             }).catch(err => {
                 console.error('加载file.js失败:', err);
             });
@@ -33,13 +33,22 @@ export function setupFileListClick() {
         if (e.target.classList.contains('delete-btn')) {
             const filePath = e.target.dataset.filepath;
             if (confirm('确定要删除该文件吗？')) {
-                fetch(`/api/delete?path=${encodeURIComponent(filePath)}&mode=remote`, {
+                const fileMode = localStorage.getItem('fileMode');
+                const isRemote = fileMode === 'remote';
+                let url = `/api/delete?path=${encodeURIComponent(filePath)}`;
+                if (isRemote) {
+                    url += '&mode=remote';
+                } else {
+                    url += '&mode=local';
+                }
+                
+                fetch(url, {
                     method: 'POST'
                 }).then(res => res.json()).then(data => {
                     if (data.success) {
                         // 刷新文件列表
                         import('./file.js').then(module => {
-                            module.fetchFileList(null, true, true);
+                            module.fetchFileList(null, true);
                         });
                     } else {
                         alert(data.error || '删除失败');
@@ -74,8 +83,15 @@ export function renderFileList(data) {
     });
     data.files.forEach(file => {
         const filePath = (path.replace(/\/+$|\/+$|^\/+/, '') === '/' ? '' : path) + '/' + file.name;
-        // 确保mode=remote参数正确传递
-        const downloadUrl = `/api/download?path=${encodeURIComponent(filePath)}&mode=remote`;
+        // 根据当前模式设置下载URL
+        const fileMode = localStorage.getItem('fileMode');
+        const isRemote = fileMode === 'remote';
+        let downloadUrl = `/api/download?path=${encodeURIComponent(filePath)}`;
+        if (isRemote) {
+            downloadUrl += '&mode=remote';
+        } else {
+            downloadUrl += '&mode=local';
+        }
         html += `<tr class="${rowIdx % 2 === 0 ? '' : 'row-alt'}">
             <td>
                 <a href="${downloadUrl}">${file.name}</a>
@@ -149,7 +165,7 @@ export function showPathInput() {
 
     function fetchSubDirs(path) {
         import('./file.js').then(module => {
-            module.fetchFileList(path, false, true);
+            module.fetchFileList(path, false);
         });
     }
 
@@ -186,7 +202,7 @@ export function showPathInput() {
                 fetchSubDirs(input.value);
             } else {
                 import('./file.js').then(module => {
-                    module.fetchFileList(input.value, true, true);
+                    module.fetchFileList(input.value, true);
                 });
             }
         } else if (e.key === 'Escape') {

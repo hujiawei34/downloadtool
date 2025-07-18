@@ -142,7 +142,18 @@ class RemoteFileService(FileService):
             port = ssh_info.get("ssh_port", 22)
             username = ssh_info["user_name"]
             password = ssh_info.get("user_pwd", "")
-            path = rel_path
+            
+            # rel_path is the directory path, we need to combine it with the filename
+            directory_path = rel_path
+            filename = file_obj.filename
+            if not filename:
+                return {"success": False, "error": "文件名为空"}
+            
+            # Combine directory path with filename
+            if directory_path.endswith('/'):
+                path = directory_path + filename
+            else:
+                path = directory_path + '/' + filename
 
             if password:
                 transport = paramiko.Transport((host, port))
@@ -169,6 +180,33 @@ class RemoteFileService(FileService):
                 path = "/" + path
             tmp_file = tempfile.NamedTemporaryFile(delete=False)
             file_obj.save(tmp_file.name)
+            
+            # Create directory structure if it doesn't exist
+            remote_dir = path.rsplit('/', 1)[0] if '/' in path else ''
+            if remote_dir:
+                try:
+                    # Create directories recursively
+                    dirs_to_create = []
+                    current_dir = remote_dir
+                    while current_dir and current_dir != '/':
+                        try:
+                            sftp.stat(current_dir)
+                            break  # Directory exists
+                        except Exception:
+                            dirs_to_create.append(current_dir)
+                            current_dir = current_dir.rsplit('/', 1)[0] if '/' in current_dir else ''
+                    
+                    # Create directories from parent to child
+                    for dir_path in reversed(dirs_to_create):
+                        try:
+                            sftp.mkdir(dir_path)
+                        except Exception:
+                            # Directory might already exist, ignore error
+                            pass
+                except Exception:
+                    # If directory creation fails, continue anyway
+                    pass
+            
             sftp.put(tmp_file.name, path)
             sftp.close()
             if not password:

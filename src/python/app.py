@@ -34,6 +34,11 @@ def index():
     logger.info("[app] index page requested")
     return render_template("index.html")
 
+@app.route("/files")
+def files():
+    logger.info("[app] files page requested")
+    return render_template("files.html")
+
 @app.route("/api/list", methods=["GET"])
 def api_list_dir():
     mode = request.args.get("mode")
