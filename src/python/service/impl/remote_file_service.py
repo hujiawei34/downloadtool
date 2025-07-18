@@ -9,12 +9,22 @@ from utils.log_util import default_logger as logger
 from ..file_service import FileService
 
 class RemoteFileService(FileService):
+    def __init__(self):
+        self.current_server = None  # Track the currently connected server
     def list_dir(self, mode: str, rel_path: str = "") -> Dict[str, Any]:
         logger.info(f"[RemoteFileService] list_dir: mode={mode}, rel_path={rel_path}")
         try:
             with open(CONFIG_FILE, "r", encoding="utf-8") as f:
                 config = json.load(f)
-            remote = config["remote_server_list"][0]
+            
+            # Use the current server if available, otherwise use the first one
+            if self.current_server:
+                remote = self.current_server
+                logger.info(f"[RemoteFileService] Using current server: {remote.get('server_name')}")
+            else:
+                remote = config["remote_server_list"][0]
+                logger.info(f"[RemoteFileService] Using first server: {remote.get('server_name')}")
+            
             ssh_info = remote["config"]
             host = ssh_info["host_ip"]
             port = ssh_info.get("ssh_port", 22)
@@ -85,7 +95,15 @@ class RemoteFileService(FileService):
         try:
             with open(CONFIG_FILE, "r", encoding="utf-8") as f:
                 config = json.load(f)
-            remote = config["remote_server_list"][0]
+            
+            # Use the current server if available, otherwise use the first one
+            if self.current_server:
+                remote = self.current_server
+                logger.info(f"[RemoteFileService] download_file using current server: {remote.get('server_name')}")
+            else:
+                remote = config["remote_server_list"][0]
+                logger.info(f"[RemoteFileService] download_file using first server: {remote.get('server_name')}")
+            
             ssh_info = remote["config"]
             host = ssh_info["host_ip"]
             port = ssh_info.get("ssh_port", 22)
@@ -136,7 +154,15 @@ class RemoteFileService(FileService):
         try:
             with open(CONFIG_FILE, "r", encoding="utf-8") as f:
                 config = json.load(f)
-            remote = config["remote_server_list"][0]
+            
+            # Use the current server if available, otherwise use the first one
+            if self.current_server:
+                remote = self.current_server
+                logger.info(f"[RemoteFileService] upload_file using current server: {remote.get('server_name')}")
+            else:
+                remote = config["remote_server_list"][0]
+                logger.info(f"[RemoteFileService] upload_file using first server: {remote.get('server_name')}")
+            
             ssh_info = remote["config"]
             host = ssh_info["host_ip"]
             port = ssh_info.get("ssh_port", 22)
@@ -226,7 +252,15 @@ class RemoteFileService(FileService):
         try:
             with open(CONFIG_FILE, "r", encoding="utf-8") as f:
                 config = json.load(f)
-            remote = config["remote_server_list"][0]
+            
+            # Use the current server if available, otherwise use the first one
+            if self.current_server:
+                remote = self.current_server
+                logger.info(f"[RemoteFileService] delete_file using current server: {remote.get('server_name')}")
+            else:
+                remote = config["remote_server_list"][0]
+                logger.info(f"[RemoteFileService] delete_file using first server: {remote.get('server_name')}")
+            
             ssh_info = remote["config"]
             host = ssh_info["host_ip"]
             port = ssh_info.get("ssh_port", 22)
@@ -281,7 +315,15 @@ class RemoteFileService(FileService):
         try:
             with open(CONFIG_FILE, "r", encoding="utf-8") as f:
                 config = json.load(f)
-            remote = config["remote_server_list"][0]
+            
+            # Use the current server if available, otherwise use the first one
+            if self.current_server:
+                remote = self.current_server
+                logger.info(f"[RemoteFileService] get_default_dir using current server: {remote.get('server_name')}")
+            else:
+                remote = config["remote_server_list"][0]
+                logger.info(f"[RemoteFileService] get_default_dir using first server: {remote.get('server_name')}")
+            
             ssh_info = remote["config"]
             default_dir = ssh_info.get("default_dir", "~")
             logger.info(f"[RemoteFileService] get_default_dir result: {default_dir}")
@@ -325,6 +367,17 @@ class RemoteFileService(FileService):
                 )
                 ssh.close()
             logger.info(f"[RemoteFileService] test_server_connectivity success: host={host}")
+            # Find and set the current server based on the host
+            try:
+                with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+                    config = json.load(f)
+                for remote in config.get("remote_server_list", []):
+                    if remote["config"]["host_ip"] == host:
+                        self.current_server = remote
+                        logger.info(f"[RemoteFileService] Set current server to: {remote.get('server_name')}")
+                        break
+            except Exception as e:
+                logger.error(f"Failed to set current server: {e}")
             return {"success": True}
         except Exception as e:
             logger.error(f"远程服务器连通性测试失败 host={host} user={username} error={e}")
@@ -336,8 +389,10 @@ class RemoteFileService(FileService):
             with open(CONFIG_FILE, "r", encoding="utf-8") as f:
                 config = json.load(f)
             for remote in config.get("remote_server_list", []):
-                if remote.get("name") == server_name:
+                if remote.get("server_name") == server_name:
                     remote["config"]["user_pwd"] = user_pwd
+                    # Update the current server to this one
+                    self.current_server = remote
             with open(CONFIG_FILE, "w", encoding="utf-8") as f:
                 json.dump(config, f, ensure_ascii=False, indent=2)
             logger.info(f"[RemoteFileService] save_server_pwd success: server_name={server_name}")
