@@ -7,7 +7,8 @@
 from pathlib import Path
 
 # 项目根目录 - 从当前文件向上3级
-PROJECT_ROOT = Path(__file__).parent.parent.parent
+PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
+
 
 # 重要路径
 REQUIREMENTS_FILE = PROJECT_ROOT / "src" / "python" / "requirements.txt"

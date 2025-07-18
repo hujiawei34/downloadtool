@@ -8,12 +8,14 @@ from flask import (
 from flask_cors import CORS
 import os
 
-from utils.constants import FRONT_DIR
+from utils.constants import FRONT_DIR,PROJECT_ROOT
 from utils.log_util import default_logger as logger
 
 from service.impl.local_file_service import LocalFileService
 from service.impl.remote_file_service import RemoteFileService
-
+logger.info("[app] Starting Flask application")
+logger.info("FRONT_DIR: %s", FRONT_DIR)
+logger.info("PROJECT_ROOT: %s", PROJECT_ROOT)
 app = Flask(
     __name__,
     static_folder=str(FRONT_DIR / "static"),
