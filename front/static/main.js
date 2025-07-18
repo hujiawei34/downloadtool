@@ -17,9 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
         initIndexPage();
     }
     
-    setupFileListClick();
-    
-    // 添加上传按钮事件监听
+    // 添加上传按钮事件监听 (仅在files页面存在)
     document.getElementById('upload-files-btn')?.addEventListener('click', uploadFiles);
     document.getElementById('upload-folders-btn')?.addEventListener('click', uploadFolders);
 });
@@ -60,6 +58,9 @@ function initFilesPage() {
     } else {
         console.error('Back button not found');
     }
+    
+    // 设置文件列表点击事件监听
+    setupFileListClick();
     
     // 加载文件列表
     fetchFileList();

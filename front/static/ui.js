@@ -17,6 +17,10 @@ import { fetchFileList } from './file.js';
 // 事件委托：监听文件夹点击和删除按钮点击
 export function setupFileListClick() {
     const fileList = document.getElementById('file-list');
+    if (!fileList) {
+        console.warn('file-list element not found, skipping setupFileListClick');
+        return;
+    }
     fileList.addEventListener('click', function(e) {
         // 处理目录点击
         if (e.target.tagName === 'A' && e.target.dataset.dirpath) {
