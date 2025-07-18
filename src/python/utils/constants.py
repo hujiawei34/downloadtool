@@ -13,5 +13,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 REQUIREMENTS_FILE = PROJECT_ROOT / "src" / "python" / "requirements.txt"
 CONFIG_FILE = PROJECT_ROOT / "config.json"
 
+FRONT_DIR = PROJECT_ROOT / "front"
+
 # 日志文件路径
 LOG_FILE = PROJECT_ROOT / "logs" / "app.log"
