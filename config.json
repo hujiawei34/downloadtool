@@ -5,7 +5,17 @@
             "server_name": "",
             "config": {
                 "host_ip": "192.168.0.188",
-                "user_name": "pc",
+                "user_name": "hjw",
+                "user_pwd": "",
+                "ssh_port": 22,
+                "default_dir": "~"
+            }
+        },
+        {
+            "server_name": "",
+            "config": {
+                "host_ip": "172.16.1.100",
+                "user_name": "hjw",
                 "user_pwd": "",
                 "ssh_port": 22,
                 "default_dir": "~"
