@@ -96,16 +96,5 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('connect-status').textContent = '连接失败: ' + err.message;
         });
     });
-    // 在files.html页面中使用的返回按钮处理
-    if (document.getElementById('back-to-server-btn')) {
-        document.getElementById('back-to-server-btn').addEventListener('click', function() {
-            // 清除保存的模式和路径
-            localStorage.removeItem('fileMode');
-            localStorage.removeItem('selectedServer');
-            localStorage.removeItem('lastPath');
-            
-            // 跳转回服务器选择页面
-            window.location.href = '/';
-        });
-    }
+    // 返回按钮事件监听现在在main.js的initFilesPage中处理
 });

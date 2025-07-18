@@ -44,6 +44,23 @@ function initFilesPage() {
         modeIndicator.textContent = fileMode === 'remote' ? '远程模式' : '本地模式';
     }
     
+    // 设置返回按钮事件监听
+    const backBtn = document.getElementById('back-to-server-btn');
+    if (backBtn) {
+        backBtn.addEventListener('click', function() {
+            // 清除保存的模式和路径
+            localStorage.removeItem('fileMode');
+            localStorage.removeItem('selectedServer');
+            localStorage.removeItem('lastPath');
+            
+            // 跳转回服务器选择页面
+            window.location.href = '/';
+        });
+        console.log('Back button event listener attached');
+    } else {
+        console.error('Back button not found');
+    }
+    
     // 加载文件列表
     fetchFileList();
 } 
