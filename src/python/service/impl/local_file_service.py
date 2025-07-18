@@ -66,6 +66,9 @@ class LocalFileService(FileService):
         if not filename:
             return {"success": False, "error": "文件名为空"}
         
+        # Normalize path separators for cross-platform compatibility
+        filename = filename.replace('/', os.sep).replace('\\', os.sep)
+        
         # Combine directory path with filename
         abs_path = os.path.join(directory_path, filename)
         
