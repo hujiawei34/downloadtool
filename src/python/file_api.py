@@ -1,6 +1,6 @@
 import os
 from flask import request, jsonify, send_file
-from log_util import write_log
+from utils.log_util import write_log
 from werkzeug.utils import secure_filename
 
 def list_dir():

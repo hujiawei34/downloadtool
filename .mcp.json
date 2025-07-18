@@ -1,0 +1,26 @@
+{
+  "mcpServers": {
+    "basic-memory": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "basic-memory",
+        "mcp"
+      ],
+      "env": {}
+    },
+    "postgres": {
+      "type": "stdio",
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "--network=host",
+        "mcp/postgres",
+        "postgresql://postgres:postgres%40cloud@localhost:18101/cloud-platform"
+      ],
+      "env": {}
+    }
+  }
+}
