@@ -2,7 +2,7 @@
     "port": 18023,
     "remote_server_list": [
         {
-            "server_name": "",
+            "server_name": "Server1 (192.168.0.188)",
             "config": {
                 "host_ip": "192.168.0.188",
                 "user_name": "hjw",
@@ -12,7 +12,7 @@
             }
         },
         {
-            "server_name": "",
+            "server_name": "Server2 (172.16.1.100)",
             "config": {
                 "host_ip": "172.16.1.100",
                 "user_name": "hjw",

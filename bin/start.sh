@@ -1,3 +1,4 @@
+#!/usr/bin/bash
 project_dir=$(cd $(dirname $0)/..; pwd)
 cd $project_dir
 

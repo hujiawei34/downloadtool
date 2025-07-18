@@ -12,6 +12,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (window.location.pathname === '/files') {
         // 初始化文件页面
         initFilesPage();
+    } else if (window.location.pathname === '/') {
+        // 初始化首页 - 服务器选择页面
+        initIndexPage();
     }
     
     setupFileListClick();
@@ -20,6 +23,11 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('upload-files-btn')?.addEventListener('click', uploadFiles);
     document.getElementById('upload-folders-btn')?.addEventListener('click', uploadFolders);
 });
+
+function initIndexPage() {
+    // 首页初始化逻辑已在server.js中处理
+    console.log('Index page initialized');
+}
 
 function initFilesPage() {
     // 检查是否有保存的模式

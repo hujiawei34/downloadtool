@@ -53,8 +53,8 @@ export function loadServerList(autoConnect = false) {
 
 document.addEventListener('DOMContentLoaded', function() {
     localStorage.removeItem('lastPath');
-    // 移除自动加载远程服务器列表
-    // loadServerList(true);
+    // 加载远程服务器列表
+    loadServerList();
     document.getElementById('server-list').addEventListener('change', function() {
         selectedServer = serverList[this.value];
     });
