@@ -1,26 +1,26 @@
 {
-    "port": 18023,
-    "remote_server_list": [
-        {
-            "server_name": "Server1 (192.168.0.188)",
-            "config": {
-                "host_ip": "192.168.0.188",
-                "user_name": "hjw",
-                "user_pwd": "",
-                "ssh_port": 22,
-                "default_dir": "~"
-            }
-        },
-        {
-            "server_name": "Server2 (172.16.1.100)",
-            "config": {
-                "host_ip": "172.16.1.100",
-                "user_name": "hjw",
-                "user_pwd": "",
-                "ssh_port": 22,
-                "default_dir": "~"
-            }
-        }
-    ],
-    "local_default_dir": "~"
+  "port": 18023,
+  "remote_server_list": [
+    {
+      "server_name": "hjw@192.168.0.188",
+      "config": {
+        "host_ip": "192.168.0.188",
+        "user_name": "hjw",
+        "user_pwd": "",
+        "ssh_port": 22,
+        "default_dir": "~"
+      }
+    },
+    {
+      "server_name": "hjw@172.16.1.100",
+      "config": {
+        "host_ip": "172.16.1.100",
+        "user_name": "hjw",
+        "user_pwd": "",
+        "ssh_port": 22,
+        "default_dir": "~"
+      }
+    }
+  ],
+  "local_default_dir": "~"
 }
