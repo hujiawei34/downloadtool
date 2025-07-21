@@ -38,6 +38,17 @@ python app.py
 ### 3. 访问前端页面
 浏览器访问：http://服务器IP:18023
 
+效果图:
+
+首页:
+
+![image-20250721110931637](https://hjw2727img.oss-cn-nanjing.aliyuncs.com/images/image-20250721110931637.png)
+
+文件列表页面: 可统计目录大小
+
+![image-20250721110853131](https://hjw2727img.oss-cn-nanjing.aliyuncs.com/images/image-20250721110853131.png)
+
+
 ## 备注
 - 前端和后端已分离，便于维护和扩展
 - 文件列表样式参考了 downloadweb.jpg 
