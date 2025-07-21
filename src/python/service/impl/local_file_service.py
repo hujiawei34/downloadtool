@@ -19,6 +19,9 @@ class LocalFileService(FileService):
             return {"error": "路径不存在"}
         files = []
         dirs = []
+        total_size = 0
+        file_count = 0
+        
         for entry in os.scandir(abs_path):
             entry_stat = entry.stat()
             if entry.is_dir():
@@ -26,7 +29,7 @@ class LocalFileService(FileService):
                     {
                         "name": entry.name,
                         "type": "dir",
-                        "size": entry_stat.st_size,
+                        "size": None,  # 不计算目录大小，使用None表示未知
                         "mtime": entry_stat.st_mtime,
                     }
                 )
@@ -39,7 +42,30 @@ class LocalFileService(FileService):
                         "mtime": entry_stat.st_mtime,
                     }
                 )
-        return {"dirs": dirs, "files": files, "path": abs_path}
+                total_size += entry_stat.st_size
+                file_count += 1
+        
+        # 只统计当前目录中的文件大小总和，不包含子目录
+        current_dir_info = {
+            "total_size": total_size,
+            "file_count": file_count,
+            "is_complete": False  # 标记未完全计算（不包含子目录大小）
+        }
+        
+        return {"dirs": dirs, "files": files, "path": abs_path, "dir_info": current_dir_info}
+    
+    def _get_dir_size(self, path: str) -> int:
+        """计算目录大小"""
+        total_size = 0
+        try:
+            for dirpath, dirnames, filenames in os.walk(path):
+                for filename in filenames:
+                    file_path = os.path.join(dirpath, filename)
+                    if os.path.exists(file_path) and not os.path.islink(file_path):
+                        total_size += os.path.getsize(file_path)
+        except Exception as e:
+            logger.error(f"计算目录大小出错: {str(e)}")
+        return total_size
 
     def download_file(self, mode: str, rel_path: str) -> Optional[str]:
         logger.info(f"[LocalFileService] download_file: mode={mode}, rel_path={rel_path}")
@@ -94,6 +120,42 @@ class LocalFileService(FileService):
                 os.remove(abs_path)
             return {"success": True}
         except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    def calculate_folder_size(self, mode: str, rel_path: str) -> Dict[str, Any]:
+        logger.info(f"[LocalFileService] calculate_folder_size: mode={mode}, rel_path={rel_path}")
+        abs_path = (
+            os.path.abspath(rel_path)
+            if os.path.isabs(rel_path)
+            else os.path.abspath(os.path.join("/", rel_path))
+        )
+        
+        if not os.path.exists(abs_path):
+            return {"error": "路径不存在"}
+            
+        if not os.path.isdir(abs_path):
+            return {"error": "所选路径不是文件夹"}
+            
+        total_size = 0
+        file_count = 0
+        
+        try:
+            for dirpath, dirnames, filenames in os.walk(abs_path):
+                for filename in filenames:
+                    file_path = os.path.join(dirpath, filename)
+                    if os.path.exists(file_path):  # 确保文件存在
+                        total_size += os.path.getsize(file_path)
+                        file_count += 1
+                        
+            return {
+                "success": True,
+                "total_size": total_size,
+                "file_count": file_count,
+                "path": abs_path,
+                "is_complete": True  # 标记为完整计算
+            }
+        except Exception as e:
+            logger.error(f"[LocalFileService] calculate_folder_size error: {str(e)}")
             return {"success": False, "error": str(e)}
 
     def get_default_dir(self, mode: str) -> Dict[str, Any]:

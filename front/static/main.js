@@ -3,8 +3,9 @@ import './server.js';
 import './file.js';
 import './ui.js';
 import './utils.js';
+import './modal.js';
 import { setupFileListClick } from './ui.js';
-import { uploadFiles, uploadFolders, fetchFileList } from './file.js';
+import { uploadFiles, uploadFolders, fetchFileList, calculateFolderSize } from './file.js';
 
 // 设置事件监听
 document.addEventListener('DOMContentLoaded', function() {
@@ -20,6 +21,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // 添加上传按钮事件监听 (仅在files页面存在)
     document.getElementById('upload-files-btn')?.addEventListener('click', uploadFiles);
     document.getElementById('upload-folders-btn')?.addEventListener('click', uploadFolders);
+    // 添加统计大小按钮事件监听
+    document.getElementById('calculate-size-btn')?.addEventListener('click', calculateFolderSize);
 });
 
 function initIndexPage() {

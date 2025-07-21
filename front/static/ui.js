@@ -71,22 +71,63 @@ export function renderFileList(data) {
     const pageTitle = document.getElementById('page-title');
     let path = data.path || '/';
     pageTitle.textContent = '文件浏览器 - ' + path;
+    
+    // 更新总大小显示
+    const totalSizeDisplay = document.querySelector('.total-size-display');
+    if (totalSizeDisplay && data.dir_info) {
+        if (data.dir_info.is_complete) {
+            totalSizeDisplay.textContent = `当前目录总大小: ${formatSize(data.dir_info.total_size)} (文件数: ${data.dir_info.file_count})`;
+            totalSizeDisplay.style.color = '#ff6600';
+        } else {
+            totalSizeDisplay.textContent = `文件大小: ${formatSize(data.dir_info.total_size)} (仅当前目录文件，不含子目录)`;
+            totalSizeDisplay.style.color = '#666666';
+        }
+    }
+    
     let html = '';
     html += '<table class="file-table">';
     html += '<thead><tr><th>File Name</th><th>File Size</th><th>Date</th></tr></thead>';
     html += '<tbody>';
-    if (path !== '/') {
-        const upPath = path.replace(/\/+$|\/+$|^\/+/, '').split('/').slice(0, -1).join('/') || '/';
-        html += `<tr class="row-alt"><td colspan="3"><a href="#" data-dirpath="${upPath}">../</a></td></tr>`;
+    if (path !== '/' && !isRootDrive(path)) {
+        // 处理不同操作系统的上级目录路径计算
+        let upPath;
+        if (isWindowsPath(path)) {
+            // Windows路径处理
+            if (path.endsWith(':\\') || path.endsWith(':/')) {
+                // 已经是盘符根目录，不显示上级目录
+                upPath = null;
+            } else {
+                // 移除结尾的斜杠
+                let cleanPath = path.replace(/[\/\\]+$/, '');
+                // 获取上级目录
+                upPath = cleanPath.substring(0, cleanPath.lastIndexOf('\\') + 1);
+                // 如果上级路径为空，则设为盘符根目录
+                if (!upPath) {
+                    const driveMatch = path.match(/^([A-Za-z]:)[\/\\]/);
+                    if (driveMatch) {
+                        upPath = driveMatch[1] + '\\';
+                    }
+                }
+            }
+        } else {
+            // Unix路径处理
+            upPath = path.replace(/\/+$/, '').split('/').slice(0, -1).join('/') || '/';
+        }
+        
+        // 只有在上级路径有效时才显示
+        if (upPath) {
+            html += `<tr class="row-alt"><td colspan="3"><a href="#" data-dirpath="${upPath}">../</a></td></tr>`;
+        }
     }
     let rowIdx = 0;
     data.dirs.forEach(dir => {
-        const dirPath = (path.replace(/\/+$|\/+$|^\/+/, '') === '/' ? '' : path) + '/' + dir.name;
-        html += `<tr class="${rowIdx % 2 === 0 ? '' : 'row-alt'}"><td><a href="#" data-dirpath="${dirPath}">${dir.name}/</a></td><td>-</td><td>${formatDate(dir.mtime)}</td></tr>`;
+        const dirPath = joinPath(path, dir.name);
+        const sizeDisplay = dir.size === null ? '-' : formatSize(dir.size);
+        html += `<tr class="${rowIdx % 2 === 0 ? '' : 'row-alt'}"><td><a href="#" data-dirpath="${dirPath}">${dir.name}/</a></td><td>${sizeDisplay}</td><td>${formatDate(dir.mtime)}</td></tr>`;
         rowIdx++;
     });
     data.files.forEach(file => {
-        const filePath = (path.replace(/\/+$|\/+$|^\/+/, '') === '/' ? '' : path) + '/' + file.name;
+        const filePath = joinPath(path, file.name);
         // 根据当前模式设置下载URL
         const fileMode = localStorage.getItem('fileMode');
         const isRemote = fileMode === 'remote';
@@ -108,6 +149,30 @@ export function renderFileList(data) {
     });
     html += '</tbody></table>';
     fileList.innerHTML = html;
+}
+
+// 检查是否是Windows路径
+function isWindowsPath(path) {
+    return /^[A-Za-z]:[\\\/]/.test(path);
+}
+
+// 检查是否是根驱动器路径
+function isRootDrive(path) {
+    return /^[A-Za-z]:[\\\/]$/.test(path);
+}
+
+// 连接路径，处理不同系统分隔符
+function joinPath(parentPath, childName) {
+    // 处理Windows路径
+    if (isWindowsPath(parentPath)) {
+        // 移除末尾斜杠
+        const cleanPath = parentPath.replace(/[\\\/]+$/, '');
+        return cleanPath + '\\' + childName;
+    } else {
+        // Unix路径
+        const cleanPath = parentPath.replace(/\/+$/, '');
+        return (cleanPath === '/' ? '' : cleanPath) + '/' + childName;
+    }
 }
 
 export function showPathInput() {

@@ -27,6 +27,11 @@ class FileService(ABC):
         pass
 
     @abstractmethod
+    def calculate_folder_size(self, mode: str, rel_path: str) -> Dict[str, Any]:
+        """计算文件夹大小"""
+        pass
+
+    @abstractmethod
     def get_default_dir(self, mode: str) -> Dict[str, Any]:
         """获取默认目录"""
         pass
